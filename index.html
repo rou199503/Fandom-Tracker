@@ -525,7 +525,7 @@
 
       return (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[200] flex items-center justify-center p-6">
-          <div className={`w-full max-w-xs p-6 rounded-3xl ${theme.card} relative shadow-2xl`}>
+          <div className={`w-full max-w-xs p-6 rounded-3xl ${theme.card} relative shadow-2xl max-h-[90dvh] overflow-y-auto`}>
             <button onClick={onClose} className={`absolute top-4 right-4 z-10 ${theme.cardText}`}><X size={20} /></button>
 
             <div className="text-center pt-2 space-y-6">
@@ -686,7 +686,7 @@
 
       return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-4">
-          <div className={`w-full max-w-md rounded-t-3xl sm:rounded-2xl overflow-hidden ${theme.card} animate-in slide-in-from-bottom-10 max-h-[90vh] flex flex-col shadow-2xl`}>
+          <div className={`w-full max-w-md rounded-t-3xl sm:rounded-2xl overflow-hidden ${theme.card} animate-in slide-in-from-bottom-10 max-h-[90dvh] flex flex-col shadow-2xl`}>
             <div className={`flex justify-between items-center p-5 border-b shrink-0 ${theme.name === 'Retro Pop' ? 'bg-[#EBB134] border-[#1C3052]' : 'bg-white/5 border-white/10'}`}>
               <h2 className={`text-sm font-black uppercase tracking-widest ${theme.cardText}`}>{initialData ? '編輯' : '新增'}{isMembership ? '會員' : '周邊'}</h2>
               <button type="button" onClick={onClose} className={theme.cardText}><X size={24} /></button>
@@ -737,7 +737,7 @@
                             placeholder="商品名稱" 
                             value={item.name} 
                             onChange={(e) => handleItemChange(index, 'name', e.target.value)} 
-                            className={`${theme.input} flex-1 p-4 rounded-xl h-[52px] text-sm outline-none transition-all`} 
+                            className={`${theme.input} flex-1 min-w-0 p-3 rounded-xl h-[48px] text-sm outline-none transition-all`} 
                           />
                           <input 
                             type="number" 
@@ -745,13 +745,13 @@
                             required 
                             value={item.quantity} 
                             onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} 
-                            className={`${theme.input} w-[72px] p-2 rounded-xl h-[52px] text-sm text-center outline-none transition-all font-mono font-black shrink-0`} 
+                            className={`${theme.input} w-[60px] p-2 rounded-xl h-[48px] text-sm text-center outline-none transition-all font-mono font-black shrink-0`} 
                           />
                           {formData.items.length > 1 && (
                             <button 
                               type="button" 
                               onClick={() => removeItem(index)} 
-                              className={`h-[52px] w-[52px] flex items-center justify-center rounded-xl shrink-0 transition-transform active:scale-95 ${theme.name === 'Retro Pop' ? 'bg-[#D12627] border-2 border-[#1C3052] text-white shadow-[2px_2px_0_#1C3052]' : 'bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500/20'}`}
+                              className={`h-[48px] w-[48px] flex items-center justify-center rounded-xl shrink-0 transition-transform active:scale-95 ${theme.name === 'Retro Pop' ? 'bg-[#D12627] border-2 border-[#1C3052] text-white shadow-[2px_2px_0_#1C3052]' : 'bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500/20'}`}
                             >
                               <X size={20} strokeWidth={3} />
                             </button>
@@ -902,13 +902,13 @@
       
       return (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-[120] flex items-center justify-center p-4">
-          <div className={`w-full max-w-sm rounded-3xl overflow-hidden ${theme.card} animate-in zoom-in-95 flex flex-col relative shadow-2xl`}>
+          <div className={`w-full max-w-sm rounded-3xl overflow-hidden ${theme.card} animate-in zoom-in-95 flex flex-col relative shadow-2xl max-h-[90dvh]`}>
             <button onClick={onClose} className={`absolute top-4 right-4 z-20 ${theme.cardText}`}><X size={24} /></button>
             <div className="overflow-y-auto p-6 space-y-6 pb-8">
               <div className="text-center pt-4">
                  <div className="w-16 h-16 mx-auto mb-4 border-4 flex items-center justify-center transform rotate-45" style={{ backgroundImage: `linear-gradient(135deg, ${membership.color1}, ${membership.color2})`, borderColor: 'white' }}><span className="text-white font-black text-3xl transform -rotate-45">{membership.group.charAt(0)}</span></div>
-                 <h2 className={`text-2xl font-black uppercase tracking-widest ${theme.cardText}`}>{membership.group}</h2>
-                 <p className={`text-[10px] font-black uppercase tracking-widest mt-1 ${theme.cardText} opacity-60`}>{membership.fandomName}</p>
+                 <h2 className={`text-2xl font-black uppercase tracking-widest px-6 break-words ${theme.cardText}`}>{membership.group}</h2>
+                 <p className={`text-[10px] font-black uppercase tracking-widest mt-1 px-6 break-words ${theme.cardText} opacity-60`}>{membership.fandomName}</p>
               </div>
               
               <div className={`p-5 rounded-2xl ${isRetro ? 'bg-[#EBB134] border-2 border-[#1C3052]' : 'bg-black/5 dark:bg-white/5'} space-y-4`}>
@@ -960,13 +960,13 @@
 
       return (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[120] flex items-center justify-center p-4">
-          <div className={`w-full max-sm:max-w-xs max-w-sm rounded-3xl overflow-hidden ${theme.card} animate-in zoom-in-95 flex flex-col relative shadow-2xl`}>
+          <div className={`w-full max-sm:max-w-xs max-w-sm rounded-3xl overflow-hidden ${theme.card} animate-in zoom-in-95 flex flex-col relative shadow-2xl max-h-[90dvh]`}>
             <button onClick={onClose} className={`absolute top-4 right-4 z-20 ${theme.cardText}`}><X size={24} /></button>
             <div className="overflow-y-auto p-6 space-y-6 pb-8">
               <div className="text-center pt-4">
                  <div className={`w-16 h-16 mx-auto mb-4 border-4 flex items-center justify-center transform rotate-45 ${theme.cardText} border-current`}><span className="font-black text-3xl transform -rotate-45">{merch.group.charAt(0)}</span></div>
-                 <h2 className={`text-2xl font-black uppercase tracking-widest ${theme.cardText}`}>{merch.group}</h2>
-                 <p className={`text-xs font-bold mt-1 ${theme.cardText} opacity-60`}>{topItemName}</p>
+                 <h2 className={`text-2xl font-black uppercase tracking-widest px-6 break-words ${theme.cardText}`}>{merch.group}</h2>
+                 <p className={`text-xs font-bold mt-1 px-6 break-words ${theme.cardText} opacity-60`}>{topItemName}</p>
               </div>
 
               <div className={`p-5 rounded-2xl ${isRetro ? 'bg-[#EBB134] border-2 border-[#1C3052]' : 'bg-black/5 dark:bg-white/5'} space-y-4`}>
@@ -1018,7 +1018,7 @@
                 {merch.url && (
                   <div className={`pt-2 border-t ${isRetro ? 'border-[#1C3052]/20' : 'border-black/5 dark:border-white/5'} ${theme.cardText}`}>
                      <p className="text-[9px] font-bold uppercase opacity-60 mt-2">商品網址</p>
-                     <a href={merch.url} target="_blank" rel="noopener noreferrer" className={`text-xs font-bold underline flex items-center gap-1 mt-1 ${isRetro ? 'text-[#D12627]' : 'text-blue-500'}`}>點此開啟連結 <ExternalLink size={12}/></a>
+                     <a href={merch.url} target="_blank" rel="noopener noreferrer" className={`text-xs font-bold underline flex items-center gap-1 mt-1 break-all ${isRetro ? 'text-[#D12627]' : 'text-blue-500'}`}>點此開啟連結 <ExternalLink size={12}/></a>
                   </div>
                 )}
               </div>
@@ -1037,7 +1037,7 @@
       const isRetro = theme.name === 'Retro Pop';
       return (
         <div className="fixed inset-0 bg-black/95 backdrop-blur-sm z-[200] flex items-center justify-center p-6">
-          <div className={`w-full max-w-xs p-8 rounded-3xl ${theme.card} text-center space-y-6 border-4 border-red-500 shadow-2xl`}>
+          <div className={`w-full max-w-xs p-8 rounded-3xl ${theme.card} text-center space-y-6 border-4 border-red-500 shadow-2xl max-h-[90dvh]`}>
             <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto text-red-500"><AlertTriangle size={40} /></div>
             <div className="space-y-2">
                <h3 className={`text-xl font-black uppercase tracking-wider ${theme.cardText}`}>確認刪除紀錄？</h3>
@@ -1068,7 +1068,7 @@
 
       return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[120] flex items-center justify-center p-4">
-          <div className={`w-full max-w-sm rounded-3xl overflow-hidden ${theme.card} flex flex-col max-h-[80vh] shadow-2xl`}>
+          <div className={`w-full max-w-sm rounded-3xl overflow-hidden ${theme.card} flex flex-col max-h-[90dvh] shadow-2xl`}>
             <div className={`p-5 border-b flex justify-between items-center ${theme.name === 'Retro Pop' ? 'bg-[#EBB134] border-[#1C3052]' : 'bg-white/5 border-white/10'}`}>
               <div className={`flex items-center gap-2 ${theme.cardText}`}>{year && <button onClick={() => setYear(null)} className="p-1"><ChevronLeft/></button>}<h2 className="text-sm font-black">{year ? `${year} 年度明細` : `${group} 明細`}</h2></div>
               <button onClick={onClose} className={`p-1 ${theme.cardText}`}><X size={20}/></button>
