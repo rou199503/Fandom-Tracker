@@ -824,7 +824,7 @@
                   {m.status === 'Received' ? <CheckCircle2 className="w-8 h-8" /> : <div className="w-8 h-8 rounded-full border-4 border-current opacity-20"></div>}
                 </button>
                 <div className="flex-1 min-w-0" onClick={() => onOpenDetails(m)}>
-                  <h3 className={`font-black text-sm uppercase truncate ${theme.cardText}`}>{m.group}</h3>
+                  <h3 className={`font-black text-sm truncate ${theme.cardText}`}>{m.group}</h3>
                   <p className={`text-xs mt-1 truncate ${m.status === 'Received' ? 'line-through opacity-40' : theme.cardSub}`}>[{m.buyType === 'instock' ? '現貨' : '預購'}] {displayTitle}</p>
                   <div className="flex justify-between items-center mt-2">
                     <span className={`text-[10px] ${theme.cardText} opacity-40 font-mono font-bold tracking-tighter`}>{m.date}</span>
@@ -852,12 +852,12 @@
                   <div className="absolute top-4 left-4"><span className="text-[10px] font-black px-2 py-1 rounded-sm uppercase bg-white/20 text-white backdrop-blur-md border border-white/30 tracking-widest">{m.region}</span></div>
                   <div className="z-10 text-center">
                     <div className="w-14 h-14 mx-auto mb-3 border-4 border-white flex items-center justify-center transform rotate-45"><span className="text-white font-black text-3xl transform -rotate-45">{m.group.charAt(0)}</span></div>
-                    <h3 className="text-2xl font-black text-white tracking-[0.2em] uppercase drop-shadow-xl">{m.group}</h3>
+                    <h3 className="text-2xl font-black text-white tracking-[0.2em] drop-shadow-xl">{m.group}</h3>
                   </div>
                 </div>
                 <div className={`px-5 py-5 flex justify-between items-end ${theme.vipBottom}`}>
                   <div className="flex-1 min-w-0 pr-4">
-                    <div className={`${theme.vipSubText} text-[11px] font-black mb-2 tracking-widest opacity-60 uppercase`}>{m.fandomName} OFFICIAL FANCLUB</div>
+                    <div className={`${theme.vipSubText} text-[11px] font-black mb-2 tracking-widest opacity-60`}>{m.group} OFFICIAL FANCLUB</div>
                     <div className={`${theme.vipText} text-sm font-black truncate`}>{m.memberName} <span className="mx-2 opacity-20">•</span> <span className="font-mono tracking-tighter">{m.memberNo}</span></div>
                   </div>
                   <div className="bg-white p-2 rounded-lg flex-shrink-0 shadow-inner border border-gray-100"><QrCode size={44} className="text-black" /></div>
@@ -885,7 +885,7 @@
             <div className="overflow-y-auto p-6 space-y-6 pb-8">
               <div className="text-center pt-4">
                  <div className="w-16 h-16 mx-auto mb-4 border-4 flex items-center justify-center transform rotate-45" style={{ backgroundImage: `linear-gradient(135deg, ${membership.color1}, ${membership.color2})`, borderColor: 'white' }}><span className="text-white font-black text-3xl transform -rotate-45">{membership.group.charAt(0)}</span></div>
-                 <h2 className={`text-2xl font-black uppercase tracking-widest ${theme.cardText}`}>{membership.group}</h2>
+                 <h2 className={`text-2xl font-black tracking-widest ${theme.cardText}`}>{membership.group}</h2>
                  <p className={`text-[10px] font-black uppercase tracking-widest mt-1 ${theme.cardText} opacity-60`}>{membership.fandomName}</p>
               </div>
               
@@ -943,7 +943,7 @@
             <div className="overflow-y-auto p-6 space-y-6 pb-8">
               <div className="text-center pt-4">
                  <div className={`w-16 h-16 mx-auto mb-4 border-4 flex items-center justify-center transform rotate-45 ${theme.cardText} border-current`}><span className="font-black text-3xl transform -rotate-45">{merch.group.charAt(0)}</span></div>
-                 <h2 className={`text-2xl font-black uppercase tracking-widest ${theme.cardText}`}>{merch.group}</h2>
+                 <h2 className={`text-2xl font-black tracking-widest ${theme.cardText}`}>{merch.group}</h2>
                  <p className={`text-xs font-bold mt-1 ${theme.cardText} opacity-60`}>{topItemName}</p>
               </div>
 
