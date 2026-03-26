@@ -2,17 +2,13 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
-  <!-- 針對手機最佳化的視窗設定，禁止縮放以達到原生 App 體驗 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Fandom Tracker 追星紀錄本</title>
   
-  <!-- 載入 Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- 載入 Babel 以便在瀏覽器中直接編譯 React JSX -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  <!-- 自訂滾動條隱藏樣式 -->
   <style>
     body { background-color: #0a0a0a; }
     .scrollbar-hide::-webkit-scrollbar { display: none; }
@@ -21,7 +17,6 @@
     input, select, textarea { font-size: 16px !important; }
   </style>
 
-  <!-- 設定模組依賴 (Import Map) -->
   <script type="importmap">
     {
       "imports": {
@@ -38,7 +33,6 @@
 <body>
   <div id="root"></div>
 
-  <!-- React 應用程式代碼 -->
   <script type="text/babel" data-type="module">
     import React, { useState, useMemo, useEffect } from 'react';
     import { createRoot } from 'react-dom/client';
@@ -55,8 +49,6 @@
 
     // =====================================================================
     // ⚠️ 部署設定區 ⚠️
-    // 請至 firebase.google.com 免費建立專案，並啟用 Firestore 與 Anonymous Auth。
-    // 建立網頁應用程式後，將 Config 貼到下方的 firebaseConfig 中。
     // =====================================================================
     const firebaseConfig = {
       apiKey: "AIzaSyBLGPy2-jvoOAi3P5zRt7LJXH3UoP2oslA",
@@ -77,13 +69,7 @@
       db = getFirestore(app);
     }
     
-    // 專屬的 App ID (避免與您 Firebase 中其他專案衝突)
     const appId = 'my-fandom-tracker-v1';
-
-    // --- 匯率設定 ---
-    const EXCHANGE_RATES = {
-      TWD: 1, JPY: 0.21, KRW: 0.024, USD: 32.5
-    };
 
     // --- 主題色彩配置 ---
     const themeConfig = {
@@ -149,7 +135,6 @@
       }
     };
 
-    // --- 未設定 Firebase 的引導頁面 ---
     function SetupGuide() {
       return (
         <div className="max-w-md mx-auto h-[100dvh] flex flex-col items-center justify-center p-8 text-center bg-gray-900 text-white">
@@ -183,6 +168,11 @@
       const [authError, setAuthError] = useState(null);
       const [memberships, setMemberships] = useState([]);
       const [merch, setMerch] = useState([]);
+
+      // --- 即時匯率狀態 (預設為安全備援值) ---
+      const [exchangeRates, setExchangeRates] = useState({
+        TWD: 1, JPY: 0.21, KRW: 0.024, USD: 32.5
+      });
       
       const [isFormModalOpen, setIsFormModalOpen] = useState(false);
       const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
@@ -196,6 +186,24 @@
       const [deleteConfirm, setDeleteConfirm] = useState(null);
 
       const [copySuccess, setCopySuccess] = useState(false);
+
+      // --- 取得全球即時匯率 ---
+      useEffect(() => {
+        fetch('https://open.er-api.com/v6/latest/TWD')
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.rates) {
+              setExchangeRates({
+                TWD: 1,
+                // API 給的是 1 TWD = 多少外幣，我們需要轉換成 1 外幣 = 多少 TWD
+                JPY: 1 / data.rates.JPY,
+                KRW: 1 / data.rates.KRW,
+                USD: 1 / data.rates.USD
+              });
+            }
+          })
+          .catch(err => console.error("即時匯率載入失敗，已切換至預設安全匯率", err));
+      }, []);
 
       // --- Firebase 驗證與單機備援處理 ---
       useEffect(() => {
@@ -303,13 +311,11 @@
           const docId = editingItem ? String(editingItem.id) : String(Date.now());
           const itemToSave = { ...finalData, id: docId };
 
-          // 判斷是否可用雲端儲存
           if (user && syncCode && !authError) {
             try {
               await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `memberships_${syncCode}`, docId), itemToSave);
             } catch (err) { console.error("Save Error:", err); }
           } else {
-            // 單機備援儲存
             setMemberships(prev => {
               const exists = prev.find(m => String(m.id) === docId);
               return exists ? prev.map(m => String(m.id) === docId ? itemToSave : m) : [...prev, itemToSave];
@@ -320,13 +326,11 @@
           const docId = editingItem ? String(editingItem.id) : String(Date.now());
           const itemToSave = { ...finalMerchData, id: docId };
 
-          // 判斷是否可用雲端儲存
           if (user && syncCode && !authError) {
             try {
               await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `merch_${syncCode}`, docId), itemToSave);
             } catch (err) { console.error("Save Error:", err); }
           } else {
-            // 單機備援儲存
             setMerch(prev => {
               const exists = prev.find(m => String(m.id) === docId);
               return exists ? prev.map(m => String(m.id) === docId ? itemToSave : m) : [itemToSave, ...prev];
@@ -347,7 +351,6 @@
             await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, targetId));
           } catch (err) { console.error("Delete Error:", err); }
         } else {
-          // 單機備援刪除
           if (deleteConfirm.type === 'membership') {
             setMemberships(prev => prev.filter(m => String(m.id) !== targetId));
           } else {
@@ -370,7 +373,6 @@
             await setDoc(doc(db, 'artifacts', appId, 'public', 'data', `merch_${syncCode}`, String(id)), { ...item, status: newStatus });
           } catch (err) { console.error("Status Update Error:", err); }
         } else {
-          // 單機備援更新
           setMerch(prev => prev.map(m => String(m.id) === String(id) ? { ...m, status: newStatus } : m));
         }
       };
@@ -427,7 +429,7 @@
             )}
             {activeTab === 'memberships' && <MembershipsView theme={theme} memberships={memberships} onOpenDetails={setSelectedMembership} />}
             {activeTab === 'merch' && <MerchView theme={theme} merch={merch} onToggleStatus={toggleMerchStatus} onOpenDetails={setSelectedMerch} />}
-            {activeTab === 'spending' && <SpendingView theme={theme} memberships={memberships} merch={merch} onOpenGroupMerch={setViewingGroupMerch} onOpenGroupMembership={setViewingGroupMembership} />}
+            {activeTab === 'spending' && <SpendingView theme={theme} memberships={memberships} merch={merch} onOpenGroupMerch={setViewingGroupMerch} onOpenGroupMembership={setViewingGroupMembership} exchangeRates={exchangeRates} />}
           </main>
 
           {activeTab !== 'dashboard' && activeTab !== 'spending' && (
@@ -447,8 +449,8 @@
           {selectedMembership && <MembershipDetailsModal theme={theme} membership={selectedMembership} onClose={() => setSelectedMembership(null)} onEdit={() => { setFormType('membership'); setEditingItem(selectedMembership); setSelectedMembership(null); setTimeout(() => setIsFormModalOpen(true), 50); }} onDelete={() => setDeleteConfirm({ type: 'membership', id: selectedMembership.id })} />}
           {selectedMerch && <MerchDetailsModal theme={theme} merch={selectedMerch} onClose={() => setSelectedMerch(null)} onEdit={() => { setFormType('merch'); setEditingItem(selectedMerch); setSelectedMerch(null); setTimeout(() => setIsFormModalOpen(true), 50); }} onDelete={() => setDeleteConfirm({ type: 'merch', id: selectedMerch.id })} />}
           {deleteConfirm && <ConfirmModal theme={theme} onConfirm={executeDelete} onCancel={() => setDeleteConfirm(null)} />}
-          {viewingGroupMerch && <GroupExpenseListModal theme={theme} type="merch" group={viewingGroupMerch} items={merch} onClose={() => setViewingGroupMerch(null)} onSelectItem={(item) => { setViewingGroupMerch(null); setSelectedMerch(item); }} />}
-          {viewingGroupMembership && <GroupExpenseListModal theme={theme} type="membership" group={viewingGroupMembership} items={memberships} onClose={() => setViewingGroupMembership(null)} onSelectItem={(item) => { setViewingGroupMembership(null); setSelectedMembership(item); }} />}
+          {viewingGroupMerch && <GroupExpenseListModal theme={theme} type="merch" group={viewingGroupMerch} items={merch} onClose={() => setViewingGroupMerch(null)} onSelectItem={(item) => { setViewingGroupMerch(null); setSelectedMerch(item); }} exchangeRates={exchangeRates} />}
+          {viewingGroupMembership && <GroupExpenseListModal theme={theme} type="membership" group={viewingGroupMembership} items={memberships} onClose={() => setViewingGroupMembership(null)} onSelectItem={(item) => { setViewingGroupMembership(null); setSelectedMembership(item); }} exchangeRates={exchangeRates} />}
           
           {isSyncModalOpen && <SyncModal theme={theme} syncCode={syncCode} copyToClipboard={copyToClipboard} copySuccess={copySuccess} onClose={() => setIsSyncModalOpen(false)} onSave={changeSyncCode} authError={authError} />}
         </div>
@@ -525,7 +527,7 @@
 
       return (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[200] flex items-center justify-center p-6">
-          <div className={`w-full max-w-xs p-6 rounded-3xl ${theme.card} relative shadow-2xl max-h-[90dvh] overflow-y-auto`}>
+          <div className={`w-full max-w-xs p-6 rounded-3xl ${theme.card} relative shadow-2xl`}>
             <button onClick={onClose} className={`absolute top-4 right-4 z-10 ${theme.cardText}`}><X size={20} /></button>
 
             <div className="text-center pt-2 space-y-6">
@@ -577,8 +579,8 @@
       );
     }
 
-    function SpendingView({ theme, memberships, merch, onOpenGroupMerch, onOpenGroupMembership }) {
-      const toTWD = (amount, currency) => Math.round(parseFloat(amount || 0) * (EXCHANGE_RATES[currency] || 1));
+    function SpendingView({ theme, memberships, merch, onOpenGroupMerch, onOpenGroupMembership, exchangeRates }) {
+      const toTWD = (amount, currency) => Math.round(parseFloat(amount || 0) * (exchangeRates[currency] || 1));
       const stats = useMemo(() => {
         const groupData = {};
         memberships.forEach(m => { if (!groupData[m.group]) groupData[m.group] = { membership: 0, merch: 0 }; groupData[m.group].membership += toTWD(m.fee, m.currency); });
@@ -586,7 +588,7 @@
         const totalMembership = Object.values(groupData).reduce((acc, curr) => acc + curr.membership, 0);
         const totalMerch = Object.values(groupData).reduce((acc, curr) => acc + curr.merch, 0);
         return { groupData, totalMembership, totalMerch, grandTotal: totalMembership + totalMerch };
-      }, [memberships, merch]);
+      }, [memberships, merch, exchangeRates]);
 
       const isRetro = theme.name === 'Retro Pop';
       const isLight = theme.name === 'Light';
@@ -686,7 +688,7 @@
 
       return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-4">
-          <div className={`w-full max-w-md rounded-t-3xl sm:rounded-2xl overflow-hidden ${theme.card} animate-in slide-in-from-bottom-10 max-h-[90dvh] flex flex-col shadow-2xl`}>
+          <div className={`w-full max-w-md rounded-t-3xl sm:rounded-2xl overflow-hidden ${theme.card} animate-in slide-in-from-bottom-10 max-h-[90vh] flex flex-col shadow-2xl`}>
             <div className={`flex justify-between items-center p-5 border-b shrink-0 ${theme.name === 'Retro Pop' ? 'bg-[#EBB134] border-[#1C3052]' : 'bg-white/5 border-white/10'}`}>
               <h2 className={`text-sm font-black uppercase tracking-widest ${theme.cardText}`}>{initialData ? '編輯' : '新增'}{isMembership ? '會員' : '周邊'}</h2>
               <button type="button" onClick={onClose} className={theme.cardText}><X size={24} /></button>
@@ -737,7 +739,7 @@
                             placeholder="商品名稱" 
                             value={item.name} 
                             onChange={(e) => handleItemChange(index, 'name', e.target.value)} 
-                            className={`${theme.input} flex-1 min-w-0 p-3 rounded-xl h-[48px] text-sm outline-none transition-all`} 
+                            className={`${theme.input} flex-1 p-4 rounded-xl h-[52px] text-sm outline-none transition-all`} 
                           />
                           <input 
                             type="number" 
@@ -745,13 +747,13 @@
                             required 
                             value={item.quantity} 
                             onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} 
-                            className={`${theme.input} w-[60px] p-2 rounded-xl h-[48px] text-sm text-center outline-none transition-all font-mono font-black shrink-0`} 
+                            className={`${theme.input} w-[72px] p-2 rounded-xl h-[52px] text-sm text-center outline-none transition-all font-mono font-black shrink-0`} 
                           />
                           {formData.items.length > 1 && (
                             <button 
                               type="button" 
                               onClick={() => removeItem(index)} 
-                              className={`h-[48px] w-[48px] flex items-center justify-center rounded-xl shrink-0 transition-transform active:scale-95 ${theme.name === 'Retro Pop' ? 'bg-[#D12627] border-2 border-[#1C3052] text-white shadow-[2px_2px_0_#1C3052]' : 'bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500/20'}`}
+                              className={`h-[52px] w-[52px] flex items-center justify-center rounded-xl shrink-0 transition-transform active:scale-95 ${theme.name === 'Retro Pop' ? 'bg-[#D12627] border-2 border-[#1C3052] text-white shadow-[2px_2px_0_#1C3052]' : 'bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500/20'}`}
                             >
                               <X size={20} strokeWidth={3} />
                             </button>
@@ -795,15 +797,6 @@
 
     function MerchView({ theme, merch, onToggleStatus, onOpenDetails }) {
       const [filter, setFilter] = useState('all');
-
-      // 計算各分類數量
-      const counts = useMemo(() => ({
-        all: merch.length,
-        preorder: merch.filter(m => m.buyType === 'preorder' && m.status !== 'Received').length,
-        instock: merch.filter(m => m.buyType === 'instock' && m.status !== 'Received').length,
-        received: merch.filter(m => m.status === 'Received').length
-      }), [merch]);
-
       const filtered = merch.filter(m => {
         if (filter === 'preorder') return m.buyType === 'preorder' && m.status !== 'Received';
         if (filter === 'instock') return m.buyType === 'instock' && m.status !== 'Received';
@@ -811,27 +804,12 @@
         return true;
       });
 
-      const filterTabs = [
-        { id: 'all', label: '全部' },
-        { id: 'preorder', label: '待收預購' },
-        { id: 'instock', label: '待收現貨' },
-        { id: 'received', label: '已到貨' }
-      ];
-
       return (
         <div className="space-y-4">
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide px-1">
-            {filterTabs.map(f => (
-              <button 
-                key={f.id} 
-                onClick={() => setFilter(f.id)} 
-                className={`flex-shrink-0 flex items-center justify-between gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${filter === f.id ? theme.btn : theme.pill + ' opacity-50 hover:opacity-100'}`}
-              >
-                <span>{f.label}</span>
-                {/* 數量圓角標籤 (右對齊) */}
-                <span className={`flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[9px] font-mono leading-none ${filter === f.id ? 'bg-white/30 text-white shadow-inner' : 'bg-current/10'}`}>
-                  {counts[f.id]}
-                </span>
+            {['all', 'preorder', 'instock', 'received'].map(f => (
+              <button key={f} onClick={() => setFilter(f)} className={`flex-shrink-0 px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${filter === f ? theme.btn : theme.pill + ' opacity-50'}`}>
+                {f === 'all' ? '全部' : f === 'preorder' ? '待收預購' : f === 'instock' ? '待收現貨' : '已到貨'}
               </button>
             ))}
           </div>
@@ -879,7 +857,7 @@
                 </div>
                 <div className={`px-5 py-5 flex justify-between items-end ${theme.vipBottom}`}>
                   <div className="flex-1 min-w-0 pr-4">
-                    <div className={`${theme.vipSubText} text-[11px] font-black mb-2 tracking-widest opacity-60 uppercase`}>{m.group} OFFICIAL FANCLUB</div>
+                    <div className={`${theme.vipSubText} text-[11px] font-black mb-2 tracking-widest opacity-60 uppercase`}>{m.fandomName} OFFICIAL FANCLUB</div>
                     <div className={`${theme.vipText} text-sm font-black truncate`}>{m.memberName} <span className="mx-2 opacity-20">•</span> <span className="font-mono tracking-tighter">{m.memberNo}</span></div>
                   </div>
                   <div className="bg-white p-2 rounded-lg flex-shrink-0 shadow-inner border border-gray-100"><QrCode size={44} className="text-black" /></div>
@@ -902,13 +880,13 @@
       
       return (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-[120] flex items-center justify-center p-4">
-          <div className={`w-full max-w-sm rounded-3xl overflow-hidden ${theme.card} animate-in zoom-in-95 flex flex-col relative shadow-2xl max-h-[90dvh]`}>
+          <div className={`w-full max-w-sm rounded-3xl overflow-hidden ${theme.card} animate-in zoom-in-95 flex flex-col relative shadow-2xl`}>
             <button onClick={onClose} className={`absolute top-4 right-4 z-20 ${theme.cardText}`}><X size={24} /></button>
             <div className="overflow-y-auto p-6 space-y-6 pb-8">
               <div className="text-center pt-4">
                  <div className="w-16 h-16 mx-auto mb-4 border-4 flex items-center justify-center transform rotate-45" style={{ backgroundImage: `linear-gradient(135deg, ${membership.color1}, ${membership.color2})`, borderColor: 'white' }}><span className="text-white font-black text-3xl transform -rotate-45">{membership.group.charAt(0)}</span></div>
-                 <h2 className={`text-2xl font-black uppercase tracking-widest px-6 break-words ${theme.cardText}`}>{membership.group}</h2>
-                 <p className={`text-[10px] font-black uppercase tracking-widest mt-1 px-6 break-words ${theme.cardText} opacity-60`}>{membership.fandomName}</p>
+                 <h2 className={`text-2xl font-black uppercase tracking-widest ${theme.cardText}`}>{membership.group}</h2>
+                 <p className={`text-[10px] font-black uppercase tracking-widest mt-1 ${theme.cardText} opacity-60`}>{membership.fandomName}</p>
               </div>
               
               <div className={`p-5 rounded-2xl ${isRetro ? 'bg-[#EBB134] border-2 border-[#1C3052]' : 'bg-black/5 dark:bg-white/5'} space-y-4`}>
@@ -960,13 +938,13 @@
 
       return (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[120] flex items-center justify-center p-4">
-          <div className={`w-full max-sm:max-w-xs max-w-sm rounded-3xl overflow-hidden ${theme.card} animate-in zoom-in-95 flex flex-col relative shadow-2xl max-h-[90dvh]`}>
+          <div className={`w-full max-sm:max-w-xs max-w-sm rounded-3xl overflow-hidden ${theme.card} animate-in zoom-in-95 flex flex-col relative shadow-2xl`}>
             <button onClick={onClose} className={`absolute top-4 right-4 z-20 ${theme.cardText}`}><X size={24} /></button>
             <div className="overflow-y-auto p-6 space-y-6 pb-8">
               <div className="text-center pt-4">
                  <div className={`w-16 h-16 mx-auto mb-4 border-4 flex items-center justify-center transform rotate-45 ${theme.cardText} border-current`}><span className="font-black text-3xl transform -rotate-45">{merch.group.charAt(0)}</span></div>
-                 <h2 className={`text-2xl font-black uppercase tracking-widest px-6 break-words ${theme.cardText}`}>{merch.group}</h2>
-                 <p className={`text-xs font-bold mt-1 px-6 break-words ${theme.cardText} opacity-60`}>{topItemName}</p>
+                 <h2 className={`text-2xl font-black uppercase tracking-widest ${theme.cardText}`}>{merch.group}</h2>
+                 <p className={`text-xs font-bold mt-1 ${theme.cardText} opacity-60`}>{topItemName}</p>
               </div>
 
               <div className={`p-5 rounded-2xl ${isRetro ? 'bg-[#EBB134] border-2 border-[#1C3052]' : 'bg-black/5 dark:bg-white/5'} space-y-4`}>
@@ -1018,7 +996,7 @@
                 {merch.url && (
                   <div className={`pt-2 border-t ${isRetro ? 'border-[#1C3052]/20' : 'border-black/5 dark:border-white/5'} ${theme.cardText}`}>
                      <p className="text-[9px] font-bold uppercase opacity-60 mt-2">商品網址</p>
-                     <a href={merch.url} target="_blank" rel="noopener noreferrer" className={`text-xs font-bold underline flex items-center gap-1 mt-1 break-all ${isRetro ? 'text-[#D12627]' : 'text-blue-500'}`}>點此開啟連結 <ExternalLink size={12}/></a>
+                     <a href={merch.url} target="_blank" rel="noopener noreferrer" className={`text-xs font-bold underline flex items-center gap-1 mt-1 ${isRetro ? 'text-[#D12627]' : 'text-blue-500'}`}>點此開啟連結 <ExternalLink size={12}/></a>
                   </div>
                 )}
               </div>
@@ -1037,7 +1015,7 @@
       const isRetro = theme.name === 'Retro Pop';
       return (
         <div className="fixed inset-0 bg-black/95 backdrop-blur-sm z-[200] flex items-center justify-center p-6">
-          <div className={`w-full max-w-xs p-8 rounded-3xl ${theme.card} text-center space-y-6 border-4 border-red-500 shadow-2xl max-h-[90dvh]`}>
+          <div className={`w-full max-w-xs p-8 rounded-3xl ${theme.card} text-center space-y-6 border-4 border-red-500 shadow-2xl`}>
             <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto text-red-500"><AlertTriangle size={40} /></div>
             <div className="space-y-2">
                <h3 className={`text-xl font-black uppercase tracking-wider ${theme.cardText}`}>確認刪除紀錄？</h3>
@@ -1052,9 +1030,9 @@
       );
     }
 
-    function GroupExpenseListModal({ theme, type, group, items, onClose, onSelectItem }) {
+    function GroupExpenseListModal({ theme, type, group, items, onClose, onSelectItem, exchangeRates }) {
       const [year, setYear] = useState(null); 
-      const toTWD = (v, c) => Math.round(parseFloat(v || 0) * (EXCHANGE_RATES[c] || 1));
+      const toTWD = (v, c) => Math.round(parseFloat(v || 0) * (exchangeRates[c] || 1));
       const filtered = items.filter(i => i.group === group);
       const years = useMemo(() => {
         const y = {};
@@ -1063,12 +1041,12 @@
           y[yr] = (y[yr] || 0) + toTWD(type === 'membership' ? i.fee : i.price, i.currency); 
         });
         return Object.entries(y).sort((a,b) => b[0]-a[0]);
-      }, [filtered, type]);
+      }, [filtered, type, exchangeRates]);
       const list = filtered.filter(i => (type === 'membership' ? i.startDate : i.date || '2025-01-01').startsWith(year));
 
       return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[120] flex items-center justify-center p-4">
-          <div className={`w-full max-w-sm rounded-3xl overflow-hidden ${theme.card} flex flex-col max-h-[90dvh] shadow-2xl`}>
+          <div className={`w-full max-w-sm rounded-3xl overflow-hidden ${theme.card} flex flex-col max-h-[80vh] shadow-2xl`}>
             <div className={`p-5 border-b flex justify-between items-center ${theme.name === 'Retro Pop' ? 'bg-[#EBB134] border-[#1C3052]' : 'bg-white/5 border-white/10'}`}>
               <div className={`flex items-center gap-2 ${theme.cardText}`}>{year && <button onClick={() => setYear(null)} className="p-1"><ChevronLeft/></button>}<h2 className="text-sm font-black">{year ? `${year} 年度明細` : `${group} 明細`}</h2></div>
               <button onClick={onClose} className={`p-1 ${theme.cardText}`}><X size={20}/></button>
