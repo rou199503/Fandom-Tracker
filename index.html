@@ -731,22 +731,19 @@
                     </div>
 
                     {formData.buyType === 'preorder' && (
-                      <div>
-                        <label className={labelClasses}>預計到貨 (年/月)</label>
-                        <input type="month" name="estimatedArrival" value={formData.estimatedArrival || ''} onChange={handleChange} className={inputBase + " px-2"} />
-                      </div>
+                      <div><label className={labelClasses}>預計到貨 (年/月)</label><input type="month" name="estimatedArrival" value={formData.estimatedArrival || ''} onChange={handleChange} className={inputBase} /></div>
                     )}
                     
                     <div className="space-y-3">
                       <label className={labelClasses}>購買品項與數量</label>
                       {formData.items.map((item, index) => (
-                        <div key={index} className="flex items-center gap-2">
+                        <div key={index} className="flex items-center gap-2 w-full">
                           <input 
                             required 
                             placeholder="商品名稱" 
                             value={item.name} 
                             onChange={(e) => handleItemChange(index, 'name', e.target.value)} 
-                            className={`${theme.input} flex-1 p-4 rounded-xl h-[52px] text-sm outline-none transition-all`} 
+                            className={`${theme.input} flex-1 min-w-0 px-3 py-4 rounded-xl h-[52px] text-sm outline-none transition-all`} 
                           />
                           <input 
                             type="number" 
@@ -754,13 +751,13 @@
                             required 
                             value={item.quantity} 
                             onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} 
-                            className={`${theme.input} w-[72px] p-2 rounded-xl h-[52px] text-sm text-center outline-none transition-all font-mono font-black shrink-0`} 
+                            className={`${theme.input} w-[60px] p-2 rounded-xl h-[52px] text-sm text-center outline-none transition-all font-mono font-black shrink-0`} 
                           />
                           {formData.items.length > 1 && (
                             <button 
                               type="button" 
                               onClick={() => removeItem(index)} 
-                              className={`h-[52px] w-[52px] flex items-center justify-center rounded-xl shrink-0 transition-transform active:scale-95 ${theme.name === 'Retro Pop' ? 'bg-[#D12627] border-2 border-[#1C3052] text-white shadow-[2px_2px_0_#1C3052]' : 'bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500/20'}`}
+                              className={`h-[52px] w-[48px] flex items-center justify-center rounded-xl shrink-0 transition-transform active:scale-95 ${theme.name === 'Retro Pop' ? 'bg-[#D12627] border-2 border-[#1C3052] text-white shadow-[2px_2px_0_#1C3052]' : 'bg-red-500/10 border border-red-500/20 text-red-500 hover:bg-red-500/20'}`}
                             >
                               <X size={20} strokeWidth={3} />
                             </button>
@@ -939,10 +936,6 @@
       const btnBase = "flex-1 flex items-center justify-center gap-2 py-4 rounded-xl border-2 font-black text-sm active:translate-y-1 transition-all";
       const isRetro = theme.name === 'Retro Pop';
 
-      const topItemName = merch.items && merch.items.length > 0 
-        ? (merch.items.length === 1 ? merch.items[0].name : `${merch.items[0].name} 等 ${merch.items.length} 項商品`)
-        : merch.itemName;
-
       return (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[120] flex items-center justify-center p-4">
           <div className={`w-full max-sm:max-w-xs max-w-sm rounded-3xl overflow-hidden ${theme.card} animate-in zoom-in-95 flex flex-col relative shadow-2xl max-h-[90vh]`}>
@@ -951,7 +944,7 @@
               <div className="text-center pt-4">
                  <div className={`w-16 h-16 mx-auto mb-4 border-4 flex items-center justify-center transform rotate-45 ${theme.cardText} border-current`}><span className="font-black text-3xl transform -rotate-45">{merch.group.charAt(0)}</span></div>
                  <h2 className={`text-2xl font-black tracking-widest ${theme.cardText}`}>{merch.group}</h2>
-                 <p className={`text-xs font-bold mt-1 ${theme.cardText} opacity-60`}>{topItemName}</p>
+                 <p className={`text-[10px] font-black uppercase tracking-widest mt-1 ${theme.cardText} opacity-60`}>Receipt</p>
               </div>
 
               <div className={`p-5 rounded-2xl ${isRetro ? 'bg-[#EBB134] border-2 border-[#1C3052]' : 'bg-black/5 dark:bg-white/5'} space-y-4`}>
