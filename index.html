@@ -684,7 +684,8 @@
       };
 
       const labelClasses = `block text-[10px] font-black tracking-widest mb-1.5 uppercase ${theme.cardSub}`;
-      const inputBase = `${theme.input} w-full p-4 rounded-xl h-[52px] text-sm outline-none transition-all`;
+      // iOS Safari 針對 form elements 的優化：加上 block、box-border 與 appearance-none 防止預設渲染跑版
+      const inputBase = `${theme.input} block w-full min-w-0 max-w-full overflow-hidden px-4 h-[52px] rounded-xl text-sm outline-none transition-all box-border appearance-none m-0`;
 
       return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-4">
@@ -710,7 +711,7 @@
                       <div className="w-[45%]"><label className={labelClasses}>開始日期</label><input type="date" required name="startDate" value={formData.startDate} onChange={handleChange} className={inputBase + " px-1 text-[12px]"} /></div>
                       <div className="w-[45%]">
                         <label className={labelClasses}>應援色</label>
-                        <div className="flex gap-2"><input type="color" name="color1" value={formData.color1} onChange={handleChange} className="w-1/2 h-[52px] border-2 border-[#1C3052] rounded-xl p-0 cursor-pointer overflow-hidden shadow-sm" /><input type="color" name="color2" value={formData.color2} onChange={handleChange} className="w-1/2 h-[52px] border-2 border-[#1C3052] rounded-xl p-0 cursor-pointer overflow-hidden shadow-sm" /></div>
+                        <div className="flex gap-2"><input type="color" name="color1" value={formData.color1} onChange={handleChange} className="w-1/2 h-[52px] border-2 border-[#1C3052] rounded-xl p-0 cursor-pointer overflow-hidden shadow-sm box-border" /><input type="color" name="color2" value={formData.color2} onChange={handleChange} className="w-1/2 h-[52px] border-2 border-[#1C3052] rounded-xl p-0 cursor-pointer overflow-hidden shadow-sm box-border" /></div>
                       </div>
                     </div>
                     <div className="pt-2 space-y-4 border-t border-black/5 dark:border-white/5">
@@ -731,28 +732,36 @@
                     </div>
 
                     {formData.buyType === 'preorder' && (
-                      <div className="w-full"><label className={labelClasses}>預計到貨 (年/月)</label><input type="month" name="estimatedArrival" value={formData.estimatedArrival || ''} onChange={handleChange} className={inputBase} /></div>
+                      <div className="w-full flex flex-col min-w-0">
+                        <label className={labelClasses}>預計到貨 (年/月)</label>
+                        <input type="month" name="estimatedArrival" value={formData.estimatedArrival || ''} onChange={handleChange} className={inputBase} />
+                      </div>
                     )}
                     
                     <div className="space-y-3">
                       <label className={labelClasses}>購買品項與數量</label>
                       {formData.items.map((item, index) => (
                         <div key={index} className="flex items-center gap-2 w-full">
-                          <input 
-                            required 
-                            placeholder="商品名稱" 
-                            value={item.name} 
-                            onChange={(e) => handleItemChange(index, 'name', e.target.value)} 
-                            className={`${theme.input} flex-1 min-w-0 px-3 py-4 rounded-xl h-[52px] text-sm outline-none transition-all`} 
-                          />
-                          <input 
-                            type="number" 
-                            min="1" 
-                            required 
-                            value={item.quantity} 
-                            onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} 
-                            className={`${theme.input} w-[60px] p-2 rounded-xl h-[52px] text-sm text-center outline-none transition-all font-mono font-black shrink-0`} 
-                          />
+                          {/* 改用 flex-1 搭配外圍 div 包裝，徹底解決 Safari flex 溢出問題 */}
+                          <div className="flex-1 min-w-0">
+                            <input 
+                              required 
+                              placeholder="商品名稱" 
+                              value={item.name} 
+                              onChange={(e) => handleItemChange(index, 'name', e.target.value)} 
+                              className={`${theme.input} block w-full px-3 h-[52px] rounded-xl text-sm outline-none transition-all appearance-none box-border`} 
+                            />
+                          </div>
+                          <div className="w-[64px] shrink-0">
+                            <input 
+                              type="number" 
+                              min="1" 
+                              required 
+                              value={item.quantity} 
+                              onChange={(e) => handleItemChange(index, 'quantity', e.target.value)} 
+                              className={`${theme.input} block w-full px-1 h-[52px] rounded-xl text-sm text-center outline-none transition-all font-mono font-black appearance-none box-border`} 
+                            />
+                          </div>
                           {formData.items.length > 1 && (
                             <button 
                               type="button" 
@@ -767,7 +776,7 @@
                       <button 
                         type="button" 
                         onClick={addItem} 
-                        className={`w-full py-3 rounded-xl border-2 border-dashed text-xs font-black uppercase tracking-widest transition-all ${theme.name === 'Retro Pop' ? 'border-[#1C3052]/30 text-[#1C3052]/60 hover:border-[#1C3052] hover:text-[#1C3052]' : 'border-current/20 opacity-50 hover:opacity-100 hover:border-current/50'}`}
+                        className={`w-full py-3 rounded-xl border-2 border-dashed text-xs font-black uppercase tracking-widest transition-all box-border ${theme.name === 'Retro Pop' ? 'border-[#1C3052]/30 text-[#1C3052]/60 hover:border-[#1C3052] hover:text-[#1C3052]' : 'border-current/20 opacity-50 hover:opacity-100 hover:border-current/50'}`}
                       >
                         + 新增更多品項
                       </button>
@@ -791,7 +800,7 @@
                     <div><label className={labelClasses}>訂單編號</label><input name="orderNo" value={formData.orderNo || ''} onChange={handleChange} className={inputBase + " font-mono"} /></div>
                   </div>
                 )}
-                <button type="submit" className={theme.btn + ' w-full py-4 rounded-xl font-black mt-4 shadow-xl active:translate-y-1 active:shadow-md transition-all'}>儲存更動</button>
+                <button type="submit" className={theme.btn + ' w-full py-4 rounded-xl font-black mt-4 shadow-xl active:translate-y-1 active:shadow-md transition-all box-border'}>儲存更動</button>
               </form>
             </div>
           </div>
@@ -879,7 +888,7 @@
     }
 
     function MembershipDetailsModal({ theme, membership, onClose, onEdit, onDelete }) {
-      const btnBase = "flex-1 flex items-center justify-center gap-2 py-4 rounded-xl border-2 font-black text-sm active:translate-y-1 transition-all";
+      const btnBase = "flex-1 flex items-center justify-center gap-2 py-4 rounded-xl border-2 font-black text-sm active:translate-y-1 transition-all box-border";
       const isRetro = theme.name === 'Retro Pop';
       
       return (
@@ -933,7 +942,7 @@
 
     function MerchDetailsModal({ theme, merch, onClose, onEdit, onDelete }) {
       const pmMap = { cod: '貨到付款', credit_card: '刷卡', bank_transfer: '匯款' };
-      const btnBase = "flex-1 flex items-center justify-center gap-2 py-4 rounded-xl border-2 font-black text-sm active:translate-y-1 transition-all";
+      const btnBase = "flex-1 flex items-center justify-center gap-2 py-4 rounded-xl border-2 font-black text-sm active:translate-y-1 transition-all box-border";
       const isRetro = theme.name === 'Retro Pop';
 
       const topItemName = merch.items && merch.items.length > 0 
