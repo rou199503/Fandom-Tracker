@@ -731,7 +731,7 @@
                     </div>
 
                     {formData.buyType === 'preorder' && (
-                      <div><label className={labelClasses}>預計到貨 (年/月)</label><input type="month" name="estimatedArrival" value={formData.estimatedArrival || ''} onChange={handleChange} className={inputBase} /></div>
+                      <div className="w-full"><label className={labelClasses}>預計到貨 (年/月)</label><input type="month" name="estimatedArrival" value={formData.estimatedArrival || ''} onChange={handleChange} className={inputBase} /></div>
                     )}
                     
                     <div className="space-y-3">
@@ -935,6 +935,10 @@
       const pmMap = { cod: '貨到付款', credit_card: '刷卡', bank_transfer: '匯款' };
       const btnBase = "flex-1 flex items-center justify-center gap-2 py-4 rounded-xl border-2 font-black text-sm active:translate-y-1 transition-all";
       const isRetro = theme.name === 'Retro Pop';
+
+      const topItemName = merch.items && merch.items.length > 0 
+        ? (merch.items.length === 1 ? merch.items[0].name : `${merch.items[0].name} 等 ${merch.items.length} 項商品`)
+        : merch.itemName;
 
       return (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[120] flex items-center justify-center p-4">
