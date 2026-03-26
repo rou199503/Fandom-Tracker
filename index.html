@@ -886,7 +886,7 @@
               <div className="text-center pt-4">
                  <div className="w-16 h-16 mx-auto mb-4 border-4 flex items-center justify-center transform rotate-45" style={{ backgroundImage: `linear-gradient(135deg, ${membership.color1}, ${membership.color2})`, borderColor: 'white' }}><span className="text-white font-black text-3xl transform -rotate-45">{membership.group.charAt(0)}</span></div>
                  <h2 className={`text-2xl font-black tracking-widest ${theme.cardText}`}>{membership.group}</h2>
-                 <p className={`text-[10px] font-black uppercase tracking-widest mt-1 ${theme.cardText} opacity-60`}>{membership.fandomName}</p>
+                 <p className={`text-[10px] font-black tracking-widest mt-1 ${theme.cardText} opacity-60`}>{membership.fandomName}</p>
               </div>
               
               <div className={`p-5 rounded-2xl ${isRetro ? 'bg-[#EBB134] border-2 border-[#1C3052]' : 'bg-black/5 dark:bg-white/5'} space-y-4`}>
@@ -1063,7 +1063,7 @@
                 
                 return (
                   <button key={i.id} onClick={() => onSelectItem(i)} className={`w-full p-4 rounded-xl border text-left active:scale-95 transition-transform ${theme.name === 'Retro Pop' ? 'bg-white border-[#1C3052]' : 'border-white/10 bg-white/5'} ${theme.cardText}`}>
-                    <div className="flex justify-between items-start gap-2"><span className="text-xs font-black uppercase break-words">{displayName}</span><span className="text-xs font-mono font-black whitespace-nowrap">NT$ {toTWD(type==='membership'?i.fee:i.price, i.currency).toLocaleString()}</span></div>
+                    <div className="flex justify-between items-start gap-2"><span className="text-xs font-black break-words">{displayName}</span><span className="text-xs font-mono font-black whitespace-nowrap">NT$ {toTWD(type==='membership'?i.fee:i.price, i.currency).toLocaleString()}</span></div>
                     <div className={`text-[9px] mt-1 opacity-50 font-mono`}>{type === 'membership' ? i.startDate : i.date}</div>
                   </button>
                 );
