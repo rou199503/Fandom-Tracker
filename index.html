@@ -3,6 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  
+  <!-- iOS / PWA 專屬設定：加入主畫面時隱藏網址列，呈現原生 App 體驗 -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="追星紀錄本" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0a0a0a" />
+
   <title>Fandom Tracker 追星紀錄本</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
@@ -690,11 +698,11 @@
       return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-4">
           <div className={`w-full max-w-md rounded-t-3xl sm:rounded-2xl overflow-y-auto ${theme.card} animate-in slide-in-from-bottom-10 max-h-[90vh] shadow-2xl`}>
-            <div className={`flex justify-between items-center p-5 border-b ${theme.name === 'Retro Pop' ? 'bg-[#EBB134] border-[#1C3052]' : 'bg-white/5 border-white/10'}`}>
-              <h2 className={`text-sm font-black uppercase tracking-widest ${theme.cardText}`}>{initialData ? '編輯' : '新增'}{isMembership ? '會員' : '周邊'}</h2>
-              <button type="button" onClick={onClose} className={theme.cardText}><X size={24} /></button>
-            </div>
             <div className="p-6">
+              <div className="flex justify-between items-center mb-6 pb-2">
+                <h2 className={`text-sm font-black uppercase tracking-widest ${theme.cardText}`}>{initialData ? '編輯' : '新增'}{isMembership ? '會員' : '周邊'}</h2>
+                <button type="button" onClick={onClose} className={theme.cardText}><X size={24} /></button>
+              </div>
               <form onSubmit={(e) => { e.preventDefault(); onSave(formData); }} className="space-y-5">
                 {isMembership ? (
                   <div className="space-y-4">
